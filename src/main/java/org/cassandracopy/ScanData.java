@@ -9,6 +9,8 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.datastax.driver.core.BoundStatement;
+import com.datastax.driver.core.PreparedStatement;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
@@ -25,6 +27,11 @@ public class ScanData {
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(ScanData.class);
+
+	private String query = "Select * from " + columnFamily + "  where token("
+			+ primaryKey + ") >= ? AND token(" + primaryKey + ") <= ? LIMIT 10000";
+
+	private PreparedStatement preparedStatement;
 
 	@Argument(alias = "t", description = "Number of Threads", required = false)
 	private static Integer threadPoolSize = 10;
@@ -86,6 +93,8 @@ public class ScanData {
 		writer = (WriteData) writerClass.newInstance();
 
 		session = CassandraConnection.getSession(keyspace);
+
+		preparedStatement = session.prepare(query);
 
 	}
 
@@ -175,12 +184,12 @@ public class ScanData {
 
 		private void processBatch() {
 			long batchStartTime = System.currentTimeMillis();
+			
+			BoundStatement stmt = new BoundStatement(preparedStatement);
 
-			String query = "Select * from " + columnFamily + "  where token("
-					+ primaryKey + ") >= " + startToken + " AND token(id) <= "
-					+ endToken + " LIMIT 10000";
-
-			ResultSet rs = session.execute(query);
+			stmt.bind(startToken, endToken);
+			
+			ResultSet rs = session.execute(stmt);
 
 			writer.processResults(rs);
 

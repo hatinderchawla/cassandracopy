@@ -19,6 +19,7 @@ import com.datastax.driver.core.Session;
 import com.datastax.driver.core.policies.ConstantReconnectionPolicy;
 import com.datastax.driver.core.policies.DowngradingConsistencyRetryPolicy;
 import com.datastax.driver.core.policies.DCAwareRoundRobinPolicy;
+import com.datastax.driver.core.policies.RoundRobinPolicy;
 import com.datastax.driver.core.policies.TokenAwarePolicy;
 import com.datastax.driver.core.ProtocolOptions;
 
@@ -55,10 +56,13 @@ public class CassandraConnection {
 				.addContactPoints(nodes)
 				.withRetryPolicy(DowngradingConsistencyRetryPolicy.INSTANCE)
 				.withReconnectionPolicy(new ConstantReconnectionPolicy(100L))
-				.withLoadBalancingPolicy(
-						new TokenAwarePolicy(new DCAwareRoundRobinPolicy()))
 				.withCredentials(username, password).build();
 
+/* Slight performance degradation using a TokenAware policy in this scenario.
+ * Therefore taken this out.
+		.withLoadBalancingPolicy(
+				new TokenAwarePolicy(new RoundRobinPolicy()))
+*/
 		cluster.getConfiguration().getProtocolOptions()
 				.setCompression(ProtocolOptions.Compression.LZ4);
 
@@ -72,7 +76,7 @@ public class CassandraConnection {
 		cluster.init();
 	}
 
-	protected Session connect() {
+	public Session connect() {
 		return cluster.connect(defaultKeyspace);
 	}
 

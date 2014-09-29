@@ -1,5 +1,6 @@
-package org.cassandracopy;
+package org.cassandracopy.writers;
 
+import org.cassandracopy.WriteData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

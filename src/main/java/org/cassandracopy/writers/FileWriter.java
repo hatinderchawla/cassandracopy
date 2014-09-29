@@ -1,14 +1,20 @@
-package org.cassandracopy;
+package org.cassandracopy.writers;
 
+import org.cassandracopy.WriteData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.datastax.driver.core.ColumnDefinitions;
+import com.datastax.driver.core.ColumnDefinitions.Definition;
+import com.datastax.driver.core.DataType;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.util.HashMap;
 
 public class FileWriter implements WriteData {
 	private static final Logger logger = LoggerFactory
@@ -33,19 +39,19 @@ public class FileWriter implements WriteData {
 
 		while (rs.iterator().hasNext()) {
 			Row row = rs.iterator().next();
-			long id = row.getLong("id");
-			long lid = row.getLong("lid");
 
-			String text = row.getString("ibsa");
-			String line = text + "\n";
+			ColumnDefinitions columns = row.getColumnDefinitions();
+			while (columns.iterator().hasNext()) {
+			Definition column = columns.iterator().next();
+			ByteBuffer bytes = row.getBytesUnsafe(column.getName());			
 			try {
 				synchronized (os) {
-					os.write(line.getBytes());
-					os.flush();
+					os.write(bytes.array());
 				}
 			} catch (IOException e) {
 				logger.error(e.getMessage());
 				throw new RuntimeException(e.getMessage());
+			}
 			}
 			rowCount++;
 		}
