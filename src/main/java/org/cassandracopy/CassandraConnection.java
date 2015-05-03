@@ -24,7 +24,7 @@ import com.datastax.driver.core.policies.TokenAwarePolicy;
 import com.datastax.driver.core.ProtocolOptions;
 
 public class CassandraConnection {
-	private String CASSANDRA_CONNECTION_PROPERTIES = "CassandraConnection.properties";
+	private String CASSANDRA_CONNECTION_PROPERTIES = "/CassandraConnection.properties";
 
 	private static final String DEFAULT_KEYSPACE = "DefaultKeyspace";
 	private static final String USERNAME = "Username";
@@ -119,7 +119,7 @@ public class CassandraConnection {
 	private void readProperty() {
 		Properties prop = new Properties();
 		InputStream input = null;
-		input = CassandraConnection.class.getClassLoader().getResourceAsStream(
+		input = CassandraConnection.class.getResourceAsStream(
 				CASSANDRA_CONNECTION_PROPERTIES);
 
 		try {
