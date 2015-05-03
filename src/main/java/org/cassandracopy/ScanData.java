@@ -55,7 +55,7 @@ public class ScanData {
 	private static String columnFamily = "ccrc_ibsa";
 
 	@Argument(alias = "w", description = "WriterClass", required = false)
-	private static String writerClassName = "mapreduce.BlankWriter";
+	private static String writerClassName = "org.cassandracopy.writers.BlankWriter";
 
 	@Argument(alias = "p", description = "Primary Key", required = true)
 	private static String primaryKey;
@@ -177,7 +177,7 @@ public class ScanData {
 				try {
 					processBatch();
 				} catch (Exception ex) {
-					logger.error("Batch Retry failed " + batchNumber);
+					logger.error("Batch Retry failed. Batch number " + batchNumber + "Start Token : " + startToken + "End Token : " + endToken);
 				}
 			}
 		}
@@ -191,13 +191,13 @@ public class ScanData {
 			
 			ResultSet rs = session.execute(stmt);
 
-			writer.processResults(rs);
+			int rowCount = writer.processResults(rs);
 
 			long batchEndTime = System.currentTimeMillis();
 
-			logger.debug("Thread " + Thread.currentThread().getName()
+			logger.info("Thread " + Thread.currentThread().getName()
 					+ ". Batch " + this.batchNumber + " completed in "
-					+ (batchEndTime - batchStartTime) + " ms");
+					+ (batchEndTime - batchStartTime) + " ms. Returned " + rowCount + " rows.");
 		}
 	}
 }

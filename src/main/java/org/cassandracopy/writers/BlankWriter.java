@@ -11,7 +11,7 @@ public class BlankWriter implements WriteData {
 	private static final Logger logger = LoggerFactory
 			.getLogger(BlankWriter.class);
 
-	public void processResults(ResultSet rs) {
+	public int processResults(ResultSet rs) {
 		// TODO Auto-generated method stub
 		int rowCount = 0;
 
@@ -20,6 +20,7 @@ public class BlankWriter implements WriteData {
 			rowCount++;
 		}
 		logger.debug("Batch Row count " + rowCount);
+		return rowCount;
 	}
 
 	public void close() {

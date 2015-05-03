@@ -34,7 +34,7 @@ public class FileWriter implements WriteData {
 	 * @see
 	 * mapreduce.WriteData#processResults(com.datastax.driver.core.ResultSet)
 	 */
-	public void processResults(ResultSet rs) {
+	public int processResults(ResultSet rs) {
 		int rowCount = 0;
 
 		while (rs.iterator().hasNext()) {
@@ -56,6 +56,7 @@ public class FileWriter implements WriteData {
 			rowCount++;
 		}
 		logger.debug("Batch Row Count : " + rowCount);
+		return rowCount;
 	}
 
 	public void close() {

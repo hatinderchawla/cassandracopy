@@ -4,7 +4,7 @@ import com.datastax.driver.core.ResultSet;
 
 public interface WriteData {
 
-	public abstract void processResults(ResultSet rs);
+	public abstract int processResults(ResultSet rs);
 
 	public void close();
 }
